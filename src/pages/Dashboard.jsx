@@ -1,6 +1,6 @@
 // src/pages/Dashboard.jsx
 // Performance Dashboard page — assembles KPI stat cards, pipeline overview,
-// recent leads table, and quick action buttons using live data from LeadContext.
+// recent leads table, quick action buttons, and due follow-ups KPI.
 
 import React, { useState, useMemo } from 'react';
 import { useLeads } from '../context/LeadContext';
@@ -9,7 +9,7 @@ import PipelineOverview from '../components/dashboard/PipelineOverview';
 import RecentLeads from '../components/dashboard/RecentLeads';
 import QuickActions from '../components/dashboard/QuickActions';
 import LeadModal from '../components/common/LeadModal';
-import { Users, TrendingUp, Briefcase, UserCheck } from 'lucide-react';
+import { Users, TrendingUp, Briefcase, UserCheck, CalendarClock } from 'lucide-react';
 
 /**
  * Dashboard Component
@@ -23,45 +23,57 @@ export default function Dashboard() {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   // ── KPI Calculations ──────────────────────────────────────
-  const { totalLeads, activeDeals, winRate, recentNewLeads } = useMemo(() => {
-    // Total count of all leads in the system
+  const { totalLeads, activeDeals, winRate, recentNewLeads, dueFollowUps } = useMemo(() => {
     const total = leads.length;
 
-    // Count of leads in active pipeline stages (not Won or Lost)
+    // Active pipeline stages (not Won or Lost)
     const active = leads.filter((l) => !['Won', 'Lost'].includes(l.status)).length;
 
-    // Win rate calculation: Won / (Won + Lost)
+    // Win rate: Won / (Won + Lost)
     const wonCount = leads.filter((l) => l.status === 'Won').length;
     const closedCount = leads.filter((l) => ['Won', 'Lost'].includes(l.status)).length;
     const rate = closedCount > 0 ? Math.round((wonCount / closedCount) * 100) : 0;
 
-    // Count of new leads added in the last 7 days
+    // New leads in the last 7 days
     const recent = leads.filter((l) => {
       const created = new Date(l.createdAt);
       const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
       return created >= weekAgo;
     }).length;
 
-    return { totalLeads: total, activeDeals: active, winRate: rate, recentNewLeads: recent };
+    // Due follow-ups: overdue or due today
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const dueCount = leads.filter((l) => {
+      if (!l.followUpDate) return false;
+      const followUp = new Date(l.followUpDate + 'T00:00:00');
+      return followUp <= today;
+    }).length;
+
+    return {
+      totalLeads: total,
+      activeDeals: active,
+      winRate: rate,
+      recentNewLeads: recent,
+      dueFollowUps: dueCount,
+    };
   }, [leads]);
 
   // Change percentages (mocked — real analytics would compare vs previous period)
-  const leadsChange = 12.4;
-  const activeChange = 4.8;
+  const leadsChange   = 12.4;
+  const activeChange  = 4.8;
   const winRateChange = -1.5;
-  const recentChange = 8.2;
+  const recentChange  = 8.2;
+  const followUpChange = dueFollowUps > 0 ? -dueFollowUps : 0; // negative = needs attention
 
   // ── Modal Handlers ─────────────────────────────────────────
-  const handleOpenModal = () => setIsModalOpen(true);
+  const handleOpenModal  = () => setIsModalOpen(true);
   const handleCloseModal = () => setIsModalOpen(false);
-
-  const handleSaveNewLead = (leadData) => {
-    addLead(leadData);
-  };
+  const handleSaveNewLead = (leadData) => { addLead(leadData); };
 
   return (
     <div className="space-y-6 animate-in fade-in duration-200">
-      {/* Page Header — Title and subtitle */}
+      {/* Page Header */}
       <div>
         <h2 className="text-xl md:text-2xl font-bold text-slate-800 dark:text-white tracking-tight">
           Performance Dashboard
@@ -71,9 +83,8 @@ export default function Dashboard() {
         </p>
       </div>
 
-      {/* Grid of 4 Stats Cards — Key performance indicators */}
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
-        {/* KPI 1: Total Leads in database */}
+      {/* Grid of 5 KPI Stats Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-5 gap-4">
         <StatsCard
           title="Total Leads"
           value={totalLeads}
@@ -81,7 +92,6 @@ export default function Dashboard() {
           change={leadsChange}
           color="blue"
         />
-        {/* KPI 2: Active pipeline deals (not Won/Lost) */}
         <StatsCard
           title="Active Deals"
           value={activeDeals}
@@ -89,7 +99,6 @@ export default function Dashboard() {
           change={activeChange}
           color="purple"
         />
-        {/* KPI 3: Win rate percentage */}
         <StatsCard
           title="Win Rate"
           value={`${winRate}%`}
@@ -97,7 +106,6 @@ export default function Dashboard() {
           change={winRateChange}
           color="amber"
         />
-        {/* KPI 4: New leads this week */}
         <StatsCard
           title="New This Week"
           value={recentNewLeads}
@@ -105,27 +113,28 @@ export default function Dashboard() {
           change={recentChange}
           color="green"
         />
+        {/* Feature 5: Due Follow-ups KPI */}
+        <StatsCard
+          title="Due Follow-ups"
+          value={dueFollowUps}
+          icon={CalendarClock}
+          change={followUpChange}
+          color={dueFollowUps > 0 ? 'red' : 'green'}
+        />
       </div>
 
-      {/* Main Grid: Left analytics + items, Right shortcuts */}
+      {/* Main Grid: Left analytics + Right shortcuts */}
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
-
-        {/* Left Side (2/3 width): Pipeline visualization and recent leads */}
         <div className="xl:col-span-2 space-y-6">
-          {/* Pipeline funnel — stacked horizontal bar by status */}
           <PipelineOverview leads={leads} />
-
-          {/* Table of 5 most recently added leads */}
           <RecentLeads leads={leads} />
         </div>
-
-        {/* Right Side (1/3 width): Quick action buttons */}
         <div>
           <QuickActions onAddLeadClick={handleOpenModal} leads={leads} />
         </div>
       </div>
 
-      {/* Modal popup to add new leads from dashboard */}
+      {/* Modal for adding leads from dashboard */}
       <LeadModal
         isOpen={isModalOpen}
         onClose={handleCloseModal}

@@ -1,10 +1,12 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { Sun, Moon, X, ShieldAlert } from 'lucide-react';
+import { Sun, Moon, X, ShieldAlert, LogOut } from 'lucide-react';
 import { useTheme } from '../../context/ThemeContext';
+import { useAuth } from '../../context/AuthContext';
 
 export default function Sidebar({ isOpen, onClose, navItems }) {
   const { isDarkMode, toggleTheme } = useTheme();
+  const { user, logout } = useAuth();
 
   const sidebarContent = (
     <div className="flex flex-col h-full bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-700 transition-colors duration-200">
@@ -70,18 +72,30 @@ export default function Sidebar({ isOpen, onClose, navItems }) {
           </span>
         </button>
 
-        {/* Profile Card */}
+        {/* Profile Card — shows real authenticated user info */}
         <div className="flex items-center md:justify-center lg:justify-start gap-3 px-2 min-h-[44px]">
-          <img
-            src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=100&h=100"
-            alt="User profile avatar"
-            className="w-9 h-9 rounded-full object-cover border-2 border-gray-100 dark:border-gray-700 flex-shrink-0"
-          />
+          <div className="w-9 h-9 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold text-sm flex-shrink-0 border-2 border-gray-100 dark:border-gray-700">
+            {user?.name ? user.name.charAt(0).toUpperCase() : '?'}
+          </div>
           <div className="flex-1 min-w-0 lg:block md:hidden block">
-            <h4 className="text-sm font-bold text-gray-800 dark:text-gray-100 truncate">Jane Doe</h4>
-            <p className="text-[10px] text-gray-500 dark:text-gray-400 truncate">jane.doe@startup.com</p>
+            <h4 className="text-sm font-bold text-gray-800 dark:text-gray-100 truncate">
+              {user?.name || 'User'}
+            </h4>
+            <p className="text-[10px] text-gray-500 dark:text-gray-400 truncate">
+              {user?.email || ''}
+            </p>
           </div>
         </div>
+
+        {/* Logout Button */}
+        <button
+          onClick={logout}
+          className="flex items-center md:justify-center lg:justify-start w-full gap-2 px-3 py-2 text-sm font-medium text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors duration-200 min-h-[44px] cursor-pointer"
+          title="Logout"
+        >
+          <LogOut size={18} className="flex-shrink-0" />
+          <span className="lg:block md:hidden block">Logout</span>
+        </button>
       </div>
     </div>
   );
@@ -110,4 +124,3 @@ export default function Sidebar({ isOpen, onClose, navItems }) {
     </>
   );
 }
-

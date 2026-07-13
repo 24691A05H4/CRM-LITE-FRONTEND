@@ -1,59 +1,41 @@
 // src/components/leads/LeadCard.jsx
 // Card component displaying a single lead record in a compact visual block.
-// Used in the Cards grid view on the Leads page.
+// Now includes LeadScoreBadge and FollowUpBadge.
 
 import React from 'react';
 import { Edit2, Trash2, Mail, Phone, Tag, Building2 } from 'lucide-react';
 import StatusBadge from './StatusBadge';
-
-/**
- * @typedef {Object} Lead
- * @property {string} id        — Unique identifier
- * @property {string} name      — Contact person's name
- * @property {string} company   — Company name
- * @property {string} email     — Email address
- * @property {string} phone     — Phone number
- * @property {string} status    — Pipeline status
- * @property {string} source    — Acquisition source
- * @property {string} createdAt — ISO creation timestamp
- */
-
-/**
- * @typedef {Object} LeadCardProps
- * @property {Lead} lead         — Individual lead record object
- * @property {function(Lead): void} onEdit   — Callback when Edit button is clicked
- * @property {function(string): void} onDelete — Callback when Delete button is clicked
- */
+import LeadScoreBadge from './LeadScoreBadge';
+import FollowUpBadge from './FollowUpBadge';
 
 /**
  * LeadCard Component
  * Renders a single lead as a card with name, company, status badge,
- * contact info, source, and edit/delete action buttons.
+ * score, contact info, follow-up, source, and edit/delete action buttons.
  *
- * @param {LeadCardProps} props
- * @returns {React.JSX.Element}
+ * @param {{ lead: Object, onEdit: function, onDelete: function }} props
  */
 const LeadCard = React.memo(function LeadCard({ lead, onEdit, onDelete }) {
   return (
     <div className="bg-white dark:bg-[#12131C] border border-gray-200 dark:border-gray-700 rounded-xl p-5 shadow-xs hover:shadow-sm transition-colors duration-200 flex flex-col justify-between group">
 
-      {/* Upper Section — Name, Company, and Action Buttons */}
+      {/* Upper Section */}
       <div className="space-y-3">
-        {/* Header row: Lead name + action icons */}
+        {/* Header row: Lead name + score + action icons */}
         <div className="flex items-start justify-between gap-3">
-          <div>
+          <div className="min-w-0">
             {/* Lead contact name */}
-            <h4 className="text-sm font-bold text-gray-800 dark:text-white leading-snug">
+            <h4 className="text-sm font-bold text-gray-800 dark:text-white leading-snug truncate">
               {lead.name}
             </h4>
             {/* Company name with icon */}
             <div className="flex items-center gap-1.5 text-xs text-gray-500 dark:text-gray-400 mt-1">
-              <Building2 size={13} className="text-gray-400" />
-              <span>{lead.company}</span>
+              <Building2 size={13} className="text-gray-400 flex-shrink-0" />
+              <span className="truncate">{lead.company}</span>
             </div>
           </div>
 
-          {/* Edit and Delete action buttons — visible on card hover */}
+          {/* Edit and Delete action buttons */}
           <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition-opacity flex-shrink-0">
             <button
               onClick={() => onEdit(lead)}
@@ -74,31 +56,29 @@ const LeadCard = React.memo(function LeadCard({ lead, onEdit, onDelete }) {
           </div>
         </div>
 
-        {/* Status badge — colored pill showing pipeline stage */}
-        <div>
+        {/* Status badge + Score badge row */}
+        <div className="flex items-center gap-2 flex-wrap">
           <StatusBadge status={lead.status} />
+          <LeadScoreBadge lead={lead} />
         </div>
 
         {/* Divider line */}
         <div className="border-t border-gray-100 dark:border-gray-700" />
 
-        {/* Contact Details — email, phone, and source */}
+        {/* Contact Details */}
         <div className="space-y-1.5 text-[11px] text-gray-500 dark:text-gray-400 font-medium">
-          {/* Email row */}
           {lead.email && (
             <div className="flex items-center gap-2">
               <Mail size={12} className="text-gray-400" />
               <span className="truncate">{lead.email}</span>
             </div>
           )}
-          {/* Phone row */}
           {lead.phone && (
             <div className="flex items-center gap-2">
               <Phone size={12} className="text-gray-400" />
               <span>{lead.phone}</span>
             </div>
           )}
-          {/* Source row */}
           {lead.source && (
             <div className="flex items-center gap-2">
               <Tag size={12} className="text-gray-400" />
@@ -106,6 +86,13 @@ const LeadCard = React.memo(function LeadCard({ lead, onEdit, onDelete }) {
             </div>
           )}
         </div>
+
+        {/* Follow-up badge (if set) */}
+        {lead.followUpDate && (
+          <div>
+            <FollowUpBadge lead={lead} />
+          </div>
+        )}
       </div>
 
       {/* Bottom Section — Creation date */}
@@ -115,7 +102,6 @@ const LeadCard = React.memo(function LeadCard({ lead, onEdit, onDelete }) {
           {new Date(lead.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
         </span>
       </div>
-
     </div>
   );
 });

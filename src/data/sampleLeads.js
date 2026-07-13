@@ -2,8 +2,8 @@
 
 /**
  * Array of sample leads used as initial data for the CRM.
- * Upgraded schema with values, owners, and stage progression timestamps 
- * for advanced analytics visualizations.
+ * Upgraded schema with values, owners, stage progression timestamps,
+ * notes, and follow-up dates for all new features.
  */
 export const sampleLeads = [
   {
@@ -16,11 +16,19 @@ export const sampleLeads = [
     source: 'Website',
     value: 25000,
     owner: 'Sarah',
+    followUpDate: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // 2 days from now
     createdAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
     contactedAt: null,
     meetingAt: null,
     proposalAt: null,
-    wonAt: null
+    wonAt: null,
+    notes: [
+      {
+        id: 'note-1-1',
+        text: 'Initial inquiry via website contact form. Interested in the enterprise plan.',
+        createdAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
+      },
+    ],
   },
   {
     id: 'lead-2',
@@ -32,11 +40,24 @@ export const sampleLeads = [
     source: 'LinkedIn',
     value: 45000,
     owner: 'Alex',
+    followUpDate: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // yesterday (overdue)
     createdAt: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000).toISOString(),
     contactedAt: new Date(Date.now() - 14 * 24 * 60 * 60 * 1000).toISOString(),
     meetingAt: null,
     proposalAt: null,
-    wonAt: null
+    wonAt: null,
+    notes: [
+      {
+        id: 'note-2-1',
+        text: 'Connected on LinkedIn. She is the decision maker for her division.',
+        createdAt: new Date(Date.now() - 14 * 24 * 60 * 60 * 1000).toISOString(),
+      },
+      {
+        id: 'note-2-2',
+        text: 'Follow-up call scheduled. She wants to see a product demo first.',
+        createdAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
+      },
+    ],
   },
   {
     id: 'lead-3',
@@ -48,11 +69,24 @@ export const sampleLeads = [
     source: 'Referral',
     value: 120000,
     owner: 'Sarah',
+    followUpDate: null,
     createdAt: new Date(Date.now() - 45 * 24 * 60 * 60 * 1000).toISOString(),
     contactedAt: new Date(Date.now() - 44 * 24 * 60 * 60 * 1000).toISOString(),
     meetingAt: new Date(Date.now() - 35 * 24 * 60 * 60 * 1000).toISOString(),
     proposalAt: new Date(Date.now() - 20 * 24 * 60 * 60 * 1000).toISOString(),
-    wonAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString()
+    wonAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
+    notes: [
+      {
+        id: 'note-3-1',
+        text: 'Referred by Vikram Singh. Very warm lead.',
+        createdAt: new Date(Date.now() - 45 * 24 * 60 * 60 * 1000).toISOString(),
+      },
+      {
+        id: 'note-3-2',
+        text: 'Contract signed! Deal closed at ₹1,20,000.',
+        createdAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
+      },
+    ],
   },
   {
     id: 'lead-4',
@@ -64,11 +98,19 @@ export const sampleLeads = [
     source: 'Cold Call',
     value: 85000,
     owner: 'David',
+    followUpDate: null,
     createdAt: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
     contactedAt: new Date(Date.now() - 29 * 24 * 60 * 60 * 1000).toISOString(),
     meetingAt: new Date(Date.now() - 25 * 24 * 60 * 60 * 1000).toISOString(),
     proposalAt: null,
-    wonAt: null
+    wonAt: null,
+    notes: [
+      {
+        id: 'note-4-1',
+        text: 'Went with a competitor — they offered a lower price point.',
+        createdAt: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString(),
+      },
+    ],
   },
   {
     id: 'lead-5',
@@ -76,15 +118,23 @@ export const sampleLeads = [
     company: 'Singh Tech',
     email: 'vikram.singh@singhtech.in',
     phone: '+91 54321 09876',
-    status: 'Meeting Scheduled', // Equivalent to "Meeting"
+    status: 'Meeting Scheduled',
     source: 'Email Campaign',
     value: 60000,
     owner: 'Alex',
+    followUpDate: new Date().toISOString().split('T')[0], // today (due today)
     createdAt: new Date(Date.now() - 20 * 24 * 60 * 60 * 1000).toISOString(),
     contactedAt: new Date(Date.now() - 19 * 24 * 60 * 60 * 1000).toISOString(),
     meetingAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
     proposalAt: null,
-    wonAt: null
+    wonAt: null,
+    notes: [
+      {
+        id: 'note-5-1',
+        text: 'Meeting confirmed for this week. Prepare the startup CRM demo.',
+        createdAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
+      },
+    ],
   },
   {
     id: 'lead-6',
@@ -96,11 +146,13 @@ export const sampleLeads = [
     source: 'Other',
     value: 15000,
     owner: 'Sarah',
+    followUpDate: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // 5 days from now
     createdAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
     contactedAt: null,
     meetingAt: null,
     proposalAt: null,
-    wonAt: null
+    wonAt: null,
+    notes: [],
   },
   {
     id: 'lead-7',
@@ -108,15 +160,23 @@ export const sampleLeads = [
     company: 'Kumar Industries',
     email: 'sanjay@kumar.in',
     phone: '+91 77766 55544',
-    status: 'Proposal Sent', // Equivalent to "Proposal"
+    status: 'Proposal Sent',
     source: 'LinkedIn',
     value: 210000,
     owner: 'David',
+    followUpDate: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // 3 days ago (overdue)
     createdAt: new Date(Date.now() - 60 * 24 * 60 * 60 * 1000).toISOString(),
     contactedAt: new Date(Date.now() - 58 * 24 * 60 * 60 * 1000).toISOString(),
     meetingAt: new Date(Date.now() - 40 * 24 * 60 * 60 * 1000).toISOString(),
     proposalAt: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString(),
-    wonAt: null
+    wonAt: null,
+    notes: [
+      {
+        id: 'note-7-1',
+        text: 'Proposal sent via email. Waiting on budget approval from their CFO.',
+        createdAt: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString(),
+      },
+    ],
   },
   {
     id: 'lead-8',
@@ -128,10 +188,18 @@ export const sampleLeads = [
     source: 'Website',
     value: 360000,
     owner: 'Alex',
+    followUpDate: null,
     createdAt: new Date(Date.now() - 90 * 24 * 60 * 60 * 1000).toISOString(),
     contactedAt: new Date(Date.now() - 89 * 24 * 60 * 60 * 1000).toISOString(),
     meetingAt: new Date(Date.now() - 75 * 24 * 60 * 60 * 1000).toISOString(),
     proposalAt: new Date(Date.now() - 60 * 24 * 60 * 60 * 1000).toISOString(),
-    wonAt: new Date(Date.now() - 45 * 24 * 60 * 60 * 1000).toISOString()
-  }
+    wonAt: new Date(Date.now() - 45 * 24 * 60 * 60 * 1000).toISOString(),
+    notes: [
+      {
+        id: 'note-8-1',
+        text: 'Largest deal this quarter. Onboarding scheduled for next month.',
+        createdAt: new Date(Date.now() - 45 * 24 * 60 * 60 * 1000).toISOString(),
+      },
+    ],
+  },
 ];

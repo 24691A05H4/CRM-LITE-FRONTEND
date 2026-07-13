@@ -8,19 +8,13 @@ import { STATUS_OPTIONS, SOURCE_OPTIONS } from '../../constants';
 
 /**
  * @typedef {Object} LeadFormData
- * @property {string} name     — Contact person's full name (required)
- * @property {string} company  — Company or organization name (required)
- * @property {string} email    — Email address (required, validated format)
- * @property {string} phone    — Phone number (optional)
- * @property {string} status   — Pipeline status from STATUS_OPTIONS
- * @property {string} source   — Acquisition source from SOURCE_OPTIONS
- */
-
-/**
- * @typedef {Object} LeadFormProps
- * @property {LeadFormData} [initialData] — Existing lead data for edit mode
- * @property {function(LeadFormData): void} onSubmit — Triggered on successful validation
- * @property {function(): void} onCancel — Triggered when user clicks Cancel
+ * @property {string} name          — Contact person's full name (required)
+ * @property {string} company       — Company or organization name (required)
+ * @property {string} email         — Email address (required, validated format)
+ * @property {string} phone         — Phone number (optional)
+ * @property {string} status        — Pipeline status from STATUS_OPTIONS
+ * @property {string} source        — Acquisition source from SOURCE_OPTIONS
+ * @property {string|null} followUpDate — Optional follow-up date 'YYYY-MM-DD'
  */
 
 /**
@@ -28,11 +22,10 @@ import { STATUS_OPTIONS, SOURCE_OPTIONS } from '../../constants';
  * Renders input fields for all lead properties with validation.
  * Supports both CREATE and EDIT modes via the initialData prop.
  *
- * @param {LeadFormProps} props
+ * @param {{ initialData?: LeadFormData, onSubmit: function, onCancel: function }} props
  * @returns {React.JSX.Element}
  */
 export default function LeadForm({ initialData, onSubmit, onCancel }) {
-  // Form state — initialized with empty values for CREATE mode
   const [formData, setFormData] = useState({
     name: '',
     company: '',
@@ -40,12 +33,11 @@ export default function LeadForm({ initialData, onSubmit, onCancel }) {
     phone: '',
     status: 'New',
     source: 'Website',
+    followUpDate: '',
   });
 
-  // Validation error messages keyed by field name
   const [errors, setErrors] = useState({});
 
-  // When initialData changes (edit mode), populate the form fields
   useEffect(() => {
     if (initialData) {
       setFormData({
@@ -55,39 +47,23 @@ export default function LeadForm({ initialData, onSubmit, onCancel }) {
         phone: initialData.phone || '',
         status: initialData.status || 'New',
         source: initialData.source || 'Website',
+        followUpDate: initialData.followUpDate || '',
       });
     }
   }, [initialData]);
 
-  /**
-   * handleChange — Updates individual form field and clears its error
-   * @param {React.ChangeEvent<HTMLInputElement|HTMLSelectElement>} e
-   */
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
-    // Clear field-specific error when user starts correcting it
     if (errors[name]) {
       setErrors((prev) => ({ ...prev, [name]: '' }));
     }
   };
 
-  /**
-   * validate — Checks all required fields and email format
-   * @returns {boolean} True if form passes all validations
-   */
   const validate = () => {
     const newErrors = {};
-
-    // Name is required
-    if (!formData.name.trim()) {
-      newErrors.name = 'Contact Name is required';
-    }
-    // Company is required
-    if (!formData.company.trim()) {
-      newErrors.company = 'Company Name is required';
-    }
-    // Email is required and must match standard pattern
+    if (!formData.name.trim()) newErrors.name = 'Contact Name is required';
+    if (!formData.company.trim()) newErrors.company = 'Company Name is required';
     if (!formData.email.trim()) {
       newErrors.email = 'Email Address is required';
     } else {
@@ -96,22 +72,19 @@ export default function LeadForm({ initialData, onSubmit, onCancel }) {
         newErrors.email = 'Invalid email format';
       }
     }
-
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-  /**
-   * handleSubmit — Validates form and calls onSubmit with clean data
-   * @param {React.FormEvent} e
-   */
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!validate()) return;
-    onSubmit({ ...formData });
+    onSubmit({
+      ...formData,
+      followUpDate: formData.followUpDate || null,
+    });
   };
 
-  // Shared input base classes for consistent styling
   const inputBaseClass = 'w-full px-3 py-2 text-sm border rounded-lg focus:outline-none transition-colors duration-200 bg-white dark:bg-[#0D0E15] text-slate-800 dark:text-white';
   const inputNormalBorder = 'border-slate-200 dark:border-[#1F2232] focus:border-[#2563EB] dark:focus:border-blue-500';
   const inputErrorBorder = 'border-red-500 focus:ring-1 focus:ring-red-500';
@@ -119,9 +92,8 @@ export default function LeadForm({ initialData, onSubmit, onCancel }) {
   return (
     <form onSubmit={handleSubmit} className="space-y-4 text-left">
 
-      {/* Row 1: Name and Company (2-column grid) */}
+      {/* Row 1: Name and Company */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        {/* Contact Name Input — Required */}
         <div>
           <label htmlFor="lead-name" className="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1.5 uppercase tracking-wide">
             Contact Name *
@@ -136,11 +108,9 @@ export default function LeadForm({ initialData, onSubmit, onCancel }) {
             aria-invalid={!!errors.name}
             className={`${inputBaseClass} ${errors.name ? inputErrorBorder : inputNormalBorder}`}
           />
-          {/* Inline error message for screen readers and visual feedback */}
           {errors.name && <p className="text-xs text-red-500 mt-1" role="alert">{errors.name}</p>}
         </div>
 
-        {/* Company Input — Required */}
         <div>
           <label htmlFor="lead-company" className="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1.5 uppercase tracking-wide">
             Company *
@@ -159,9 +129,8 @@ export default function LeadForm({ initialData, onSubmit, onCancel }) {
         </div>
       </div>
 
-      {/* Row 2: Email and Phone (2-column grid) */}
+      {/* Row 2: Email and Phone */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        {/* Email Input — Required with format validation */}
         <div>
           <label htmlFor="lead-email" className="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1.5 uppercase tracking-wide">
             Email Address *
@@ -179,7 +148,6 @@ export default function LeadForm({ initialData, onSubmit, onCancel }) {
           {errors.email && <p className="text-xs text-red-500 mt-1" role="alert">{errors.email}</p>}
         </div>
 
-        {/* Phone Input — Optional field */}
         <div>
           <label htmlFor="lead-phone" className="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1.5 uppercase tracking-wide">
             Phone Number
@@ -196,9 +164,8 @@ export default function LeadForm({ initialData, onSubmit, onCancel }) {
         </div>
       </div>
 
-      {/* Row 3: Status and Source (2-column grid) */}
+      {/* Row 3: Status and Source */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        {/* Lead Status Dropdown */}
         <div>
           <label htmlFor="lead-status" className="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1.5 uppercase tracking-wide">
             Lead Status
@@ -211,14 +178,11 @@ export default function LeadForm({ initialData, onSubmit, onCancel }) {
             className={`${inputBaseClass} ${inputNormalBorder} cursor-pointer`}
           >
             {STATUS_OPTIONS.map((status) => (
-              <option key={status} value={status}>
-                {status}
-              </option>
+              <option key={status} value={status}>{status}</option>
             ))}
           </select>
         </div>
 
-        {/* Lead Source Dropdown */}
         <div>
           <label htmlFor="lead-source" className="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1.5 uppercase tracking-wide">
             Lead Source
@@ -231,15 +195,37 @@ export default function LeadForm({ initialData, onSubmit, onCancel }) {
             className={`${inputBaseClass} ${inputNormalBorder} cursor-pointer`}
           >
             {SOURCE_OPTIONS.map((source) => (
-              <option key={source} value={source}>
-                {source}
-              </option>
+              <option key={source} value={source}>{source}</option>
             ))}
           </select>
         </div>
       </div>
 
-      {/* Action Buttons — Cancel and Submit */}
+      {/* Row 4: Follow-up Date */}
+      <div>
+        <label htmlFor="lead-followup" className="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1.5 uppercase tracking-wide">
+          Follow-up Date <span className="normal-case font-normal">(optional)</span>
+        </label>
+        <input
+          id="lead-followup"
+          type="date"
+          name="followUpDate"
+          value={formData.followUpDate}
+          onChange={handleChange}
+          className={`${inputBaseClass} ${inputNormalBorder} cursor-pointer`}
+        />
+        {formData.followUpDate && (
+          <button
+            type="button"
+            onClick={() => setFormData((prev) => ({ ...prev, followUpDate: '' }))}
+            className="mt-1 text-[11px] text-slate-400 hover:text-rose-500 transition-colors cursor-pointer"
+          >
+            Clear date
+          </button>
+        )}
+      </div>
+
+      {/* Action Buttons */}
       <div className="flex justify-end gap-3 pt-4 border-t border-slate-100 dark:border-[#1F2232]">
         <button
           type="button"
@@ -252,7 +238,6 @@ export default function LeadForm({ initialData, onSubmit, onCancel }) {
           type="submit"
           className="px-4 py-2 text-xs md:text-sm font-semibold text-white bg-[#2563EB] hover:bg-[#1d4ed8] rounded-lg shadow-sm hover:shadow transition-colors duration-200 cursor-pointer"
         >
-          {/* Dynamic label: "Update Lead" in edit mode, "Create Lead" in create mode */}
           {initialData ? 'Update Lead' : 'Create Lead'}
         </button>
       </div>

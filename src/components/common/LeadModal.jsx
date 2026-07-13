@@ -1,33 +1,40 @@
 // src/components/common/LeadModal.jsx
-// Global modal dialog for quickly adding new leads from anywhere in the app.
-// Used by Layout.jsx, Dashboard.jsx, and Leads.jsx
+// Global modal dialog for adding/editing leads.
+// In edit mode, shows two tabs: Details (form) and Notes (activity log).
 
-import React from 'react';
-import { X } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { X, FileEdit, StickyNote } from 'lucide-react';
 import LeadForm from '../leads/LeadForm';
+import LeadNotesPanel from '../leads/LeadNotesPanel';
+import { useLeads } from '../../context/LeadContext';
 import toast from 'react-hot-toast';
 
 /**
- * @typedef {Object} LeadModalProps
- * @property {boolean} isOpen       — Whether the modal is currently visible
- * @property {function(): void} onClose — Callback to close the modal
- * @property {Object} [lead]        — Optional existing lead data for edit mode
- * @property {function(Object): void} onSave — Callback with form data on submit
- */
-
-/**
  * LeadModal Component
- * Full-screen overlay modal acting as a wrapper for LeadForm.
+ * Full-screen overlay modal wrapping LeadForm and (in edit mode) LeadNotesPanel.
  *
- * @param {LeadModalProps} props
+ * @param {{ isOpen: boolean, onClose: function, lead?: Object, onSave: function }} props
  * @returns {React.JSX.Element|null}
  */
 export default function LeadModal({ isOpen, onClose, lead, onSave }) {
+  const { getLeadById } = useLeads();
+  const [activeTab, setActiveTab] = useState('details');
+
+  // Reset to details tab whenever the modal opens or the lead changes
+  useEffect(() => {
+    if (isOpen) setActiveTab('details');
+  }, [isOpen, lead?.id]);
+
   if (!isOpen) return null;
+
+  // Always get the freshest version of the lead from context (for live note updates)
+  const freshLead = lead ? getLeadById(lead.id) : null;
+
+  const isEditMode = !!lead;
 
   const handleSubmit = (formData) => {
     onSave(formData);
-    toast.success(lead ? 'Lead updated successfully' : 'Lead created successfully', {
+    toast.success(isEditMode ? 'Lead updated successfully' : 'Lead created successfully', {
       style: {
         background: '#12131C',
         color: '#fff',
@@ -37,9 +44,16 @@ export default function LeadModal({ isOpen, onClose, lead, onSave }) {
     onClose();
   };
 
+  const tabClass = (tab) =>
+    `flex items-center gap-1.5 px-4 py-2.5 text-xs font-semibold border-b-2 transition-colors duration-200 cursor-pointer ${
+      activeTab === tab
+        ? 'border-blue-600 text-blue-600 dark:text-blue-400 dark:border-blue-400'
+        : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300'
+    }`;
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center md:p-4">
-      {/* Backdrop — click to close */}
+      {/* Backdrop */}
       <div
         onClick={onClose}
         className="fixed inset-0 bg-gray-950/40 dark:bg-black/60 backdrop-blur-xs transition-opacity hidden md:block"
@@ -51,7 +65,7 @@ export default function LeadModal({ isOpen, onClose, lead, onSave }) {
         {/* Modal Header */}
         <div className="flex items-center justify-between p-4 md:p-5 border-b border-gray-100 dark:border-gray-700">
           <h2 className="text-lg font-semibold text-gray-800 dark:text-white">
-            {lead ? 'Edit Lead' : 'Add New Lead'}
+            {isEditMode ? 'Edit Lead' : 'Add New Lead'}
           </h2>
           <button
             onClick={onClose}
@@ -62,13 +76,36 @@ export default function LeadModal({ isOpen, onClose, lead, onSave }) {
           </button>
         </div>
 
-        {/* Form Body - Render Reusable LeadForm */}
+        {/* Tabs — only shown in edit mode */}
+        {isEditMode && (
+          <div className="flex border-b border-gray-100 dark:border-gray-700 px-4 bg-white dark:bg-gray-800">
+            <button className={tabClass('details')} onClick={() => setActiveTab('details')}>
+              <FileEdit size={13} />
+              Details
+            </button>
+            <button className={tabClass('notes')} onClick={() => setActiveTab('notes')}>
+              <StickyNote size={13} />
+              Notes
+              {freshLead?.notes?.length > 0 && (
+                <span className="ml-1 px-1.5 py-0.5 text-[10px] font-bold bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-400 rounded-full">
+                  {freshLead.notes.length}
+                </span>
+              )}
+            </button>
+          </div>
+        )}
+
+        {/* Tab Content */}
         <div className="flex-1 overflow-y-auto p-4 md:p-6">
-          <LeadForm 
-            initialData={lead} 
-            onSubmit={handleSubmit} 
-            onCancel={onClose} 
-          />
+          {activeTab === 'details' ? (
+            <LeadForm
+              initialData={freshLead || lead}
+              onSubmit={handleSubmit}
+              onCancel={onClose}
+            />
+          ) : (
+            <LeadNotesPanel lead={freshLead || lead} />
+          )}
         </div>
       </div>
     </div>

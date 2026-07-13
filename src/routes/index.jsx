@@ -4,10 +4,15 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 // Layout wrapper component (contains Header, Sidebar, and global Modal)
 import Layout from '../components/common/Layout';
 
+// Auth route guard
+import ProtectedRoute from '../components/common/ProtectedRoute';
+
 // Lazy loading views for optimized performance and bundle code splitting
 const Dashboard = lazy(() => import('../pages/Dashboard'));
 const Leads = lazy(() => import('../pages/Leads'));
 const Analytics = lazy(() => import('../pages/Analytics'));
+const Login = lazy(() => import('../pages/Login'));
+const Register = lazy(() => import('../pages/Register'));
 const NotFound = lazy(() => import('../pages/NotFound'));
 
 // Premium loading fallback spinner matching color tokens
@@ -29,50 +34,71 @@ const PageLoader = () => (
 export default function AppRoutes() {
   return (
     <Routes>
-      {/* Root layout wraps pages for shared navigation structure */}
-      <Route path="/" element={<Layout />}>
-        {/* Index redirects home users to dashboard views */}
-        <Route index element={<Navigate to="/dashboard" replace />} />
-        
-        {/* Main analytical dashboard */}
-        <Route 
-          path="dashboard" 
-          element={
-            <Suspense fallback={<PageLoader />}>
-              <Dashboard />
-            </Suspense>
-          } 
-        />
-        
-        {/* Customer leads directory (Table and Kanban views) */}
-        <Route 
-          path="leads" 
-          element={
-            <Suspense fallback={<PageLoader />}>
-              <Leads />
-            </Suspense>
-          } 
-        />
-        
-        {/* Performance metrics & forecasts */}
-        <Route 
-          path="analytics" 
-          element={
-            <Suspense fallback={<PageLoader />}>
-              <Analytics />
-            </Suspense>
-          } 
-        />
-        
-        {/* 404 Fallback routing endpoint for unknown links */}
-        <Route 
-          path="*" 
-          element={
-            <Suspense fallback={<PageLoader />}>
-              <NotFound />
-            </Suspense>
-          } 
-        />
+      {/* Public auth pages */}
+      <Route
+        path="login"
+        element={
+          <Suspense fallback={<PageLoader />}>
+            <Login />
+          </Suspense>
+        }
+      />
+      <Route
+        path="register"
+        element={
+          <Suspense fallback={<PageLoader />}>
+            <Register />
+          </Suspense>
+        }
+      />
+
+      {/* Protected routes wrapped in ProtectedRoute guard */}
+      <Route element={<ProtectedRoute />}>
+        {/* Root layout wraps pages for shared navigation structure */}
+        <Route path="/" element={<Layout />}>
+          {/* Index redirects home users to dashboard views */}
+          <Route index element={<Navigate to="/dashboard" replace />} />
+          
+          {/* Main analytical dashboard */}
+          <Route 
+            path="dashboard" 
+            element={
+              <Suspense fallback={<PageLoader />}>
+                <Dashboard />
+              </Suspense>
+            } 
+          />
+          
+          {/* Customer leads directory (Table and Kanban views) */}
+          <Route 
+            path="leads" 
+            element={
+              <Suspense fallback={<PageLoader />}>
+                <Leads />
+              </Suspense>
+            } 
+          />
+          
+          {/* Performance metrics & forecasts */}
+          <Route 
+            path="analytics" 
+            element={
+              <Suspense fallback={<PageLoader />}>
+                <Analytics />
+              </Suspense>
+            } 
+          />
+          
+          {/* 404 Fallback routing endpoint for unknown links */}
+          <Route 
+            path="*" 
+            element={
+              <Suspense fallback={<PageLoader />}>
+                <NotFound />
+              </Suspense>
+            } 
+          />
+        </Route>
       </Route>
     </Routes>
   );

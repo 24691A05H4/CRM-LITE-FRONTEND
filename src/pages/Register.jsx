@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { ArrowRight, Loader2, Check } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 // Import images so Vite processes them correctly
 import bg1 from '../assets/bg1.png';
@@ -215,7 +216,11 @@ export default function Register() {
           </div>
           
           <div className="mt-6 flex gap-4">
-            <button type="button" className="flex-1 flex items-center justify-center gap-3 py-3 border border-[#353542] rounded-xl text-white hover:bg-[#252530] transition-colors text-sm font-medium">
+            <button 
+              type="button" 
+              onClick={() => toast('Google registration coming soon!', { icon: '🚀' })}
+              className="flex-1 flex items-center justify-center gap-3 py-3 border border-[#353542] rounded-xl text-white hover:bg-[#252530] transition-colors text-sm font-medium"
+            >
               <svg width="18" height="18" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                 <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
                 <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
@@ -224,7 +229,11 @@ export default function Register() {
               </svg>
               Google
             </button>
-            <button type="button" className="flex-1 flex items-center justify-center gap-3 py-3 border border-[#353542] rounded-xl text-white hover:bg-[#252530] transition-colors text-sm font-medium">
+            <button 
+              type="button" 
+              onClick={() => toast('Apple registration coming soon!', { icon: '🍎' })}
+              className="flex-1 flex items-center justify-center gap-3 py-3 border border-[#353542] rounded-xl text-white hover:bg-[#252530] transition-colors text-sm font-medium"
+            >
               <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
                 <path d="M17.05 20.28c-.98.14-2.14.15-3.14.15s-2.16-.01-3.14-.15c-.95-.13-1.98-.37-2.92-.79-1.63-.73-3.08-1.95-4.13-3.41-1.35-1.89-2.26-4.32-2.26-6.93 0-2.48.88-4.82 2.37-6.52C5.35 1.05 7.42 0 9.77 0c1.03 0 2.06.24 3.03.68.86.39 1.68.9 2.45 1.5.76-.6 1.58-1.11 2.45-1.5.97-.44 2-.68 3.03-.68 2.35 0 4.42 1.05 5.94 2.63 1.49 1.7 2.37 4.04 2.37 6.52 0 2.61-.91 5.04-2.26 6.93-1.05 1.46-2.5 2.68-4.13 3.41-.94.42-1.97.66-2.92.79H17.05z" fill="currentColor"/>
               </svg>

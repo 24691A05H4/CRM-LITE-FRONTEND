@@ -3,7 +3,7 @@
 // Context providers (LeadProvider, ThemeProvider) are mounted in main.jsx.
 
 import React from 'react';
-import { BrowserRouter } from 'react-router-dom';   // Client-side routing engine
+import { HashRouter } from 'react-router-dom';           // Client-side routing engine
 import { Toaster } from 'react-hot-toast';           // Global toast notification system
 
 // Route declarations — lazy-loaded page components
@@ -18,22 +18,21 @@ import AppRoutes from './routes';
  */
 export default function App() {
   return (
-    <BrowserRouter basename={import.meta.env.BASE_URL}>
+    <HashRouter>
       {/* Main system routes definition layer */}
       <AppRoutes />
 
       {/* Global toast notification layer — positioned bottom-right */}
       <Toaster
-        position="bottom-right"
+        position="top-right"
         toastOptions={{
-          duration: 3500,
+          duration: 3000,
           style: {
-            background: '#12131C',
+            background: '#333',
             color: '#fff',
-            border: '1px solid #1F2232',
           },
         }}
       />
-    </BrowserRouter>
+    </HashRouter>
   );
 }

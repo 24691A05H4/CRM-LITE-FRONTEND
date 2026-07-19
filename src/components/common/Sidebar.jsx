@@ -17,7 +17,7 @@ export default function Sidebar({ isOpen, onClose, navItems }) {
             <ShieldAlert size={20} className="text-[#2563EB]" />
           </div>
           <span className="font-bold text-lg tracking-tight text-gray-800 dark:text-white lg:block md:hidden block">
-            CRM Lite
+            Propel CRM Lite
           </span>
         </div>
         {/* Mobile Close Button */}

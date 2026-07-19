@@ -88,7 +88,7 @@ export default function Register() {
           <div className="flex items-center justify-between w-full">
             <div className="text-white font-bold text-2xl tracking-widest flex items-center gap-2">
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-white"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
-              CRM LITE
+              PROPEL CRM LITE
             </div>
             <Link to="/" className="text-white/80 hover:text-white flex items-center gap-2 text-sm bg-white/10 hover:bg-white/20 px-4 py-2 rounded-full backdrop-blur-md transition-all duration-200">
               Back to website <ArrowRight size={14} />

@@ -1,0 +1,1 @@
+import{n as e}from"./jsx-runtime-B8EBQspR.js";var t=e(`loader-circle`,[[`path`,{d:`M21 12a9 9 0 1 1-6.219-8.56`,key:`13zald`}]]),n=`/assets/bg1-Ck4C38kW.png`,r=`/assets/bg2-BxLFMi0y.png`,i=`/assets/bg3-mNdb5-7j.png`;export{t as i,r as n,n as r,i as t};
